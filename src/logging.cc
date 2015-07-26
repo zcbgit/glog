@@ -957,9 +957,12 @@ void LogFileObject::Write(bool force_flush,
 
     if (base_filename_selected_) {
       if (!CreateLogfile(time_pid_string)) {
-         perror("Could not create log file");
-         fprintf(stderr, "COULD NOT CREATE LOGFILE '%s'!\n",
+	if (errno != EEXIST) {
+          perror("Could not create logging file");
+          fprintf(stderr, "COULD NOT CREATE A LOGGINGFILE %s!",
                   time_pid_string.c_str());
+	}
+	return;
       }
     } else {
       // If no base filename for logs of this severity has been set, use a
@@ -1005,9 +1008,11 @@ void LogFileObject::Write(bool force_flush,
       }
       // If we never succeeded, we have to give up
       if ( success == false ) {
-        perror("Could not create logging file");
-        fprintf(stderr, "COULD NOT CREATE A LOGGINGFILE %s!",
-                time_pid_string.c_str());
+	if (errno != EEXIST) {
+          perror("Could not create logging file");
+          fprintf(stderr, "COULD NOT CREATE A LOGGINGFILE %s!",
+                  time_pid_string.c_str());
+	}
         return;
       }
     }
